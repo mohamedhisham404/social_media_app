@@ -1,22 +1,15 @@
 from fastapi import FastAPI,status,HTTPException,Response,Depends
-from pydantic import BaseModel
-from typing import Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from typing import List
 import time
 from sqlalchemy.orm import Session
-from . import models
+from . import models,schemas
 from.database import engine,get_db
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-class post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    created_at: Optional[str] = None
 
 while True:
     try:
@@ -38,30 +31,30 @@ while True:
 def read_root():
     return {"hello": "World"}   
 
-@app.get("/posts")
+@app.get("/posts",response_model=List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     posts=db.query(models.post).all()
-    return {"data":posts}
+    return posts
 
-@app.post("/posts",status_code=status.HTTP_201_CREATED)
-def create_posts(new_post:post, db: Session = Depends(get_db)):
+@app.post("/posts",status_code=status.HTTP_201_CREATED,response_model=schemas.PostResponse)
+def create_posts(new_post:schemas.PostCreate, db: Session = Depends(get_db)):
     post_dict = models.post(**new_post.dict())
     db.add(post_dict)
     db.commit()
     db.refresh(post_dict)
 
-    return {"data":post_dict}
+    return post_dict
 
-@app.get("/posts/latest")
+@app.get("/posts/latest", response_model=schemas.PostResponse)
 def get_latest_post(db: Session = Depends(get_db)):
     post_dict=db.query(models.post).order_by(models.post.created_at.desc()).first()
-    return {"data":post_dict}
+    return post_dict
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}" , response_model=schemas.PostResponse)
 def get_post(id:int, db: Session = Depends(get_db)):
     post_dict = db.query(models.post).filter(models.post.id==id).first()
     if post_dict:
-        return {"data":post_dict}
+        return post_dict
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                         detail=f"sorry, post with id {id} not found")
@@ -80,8 +73,8 @@ def delete_post(id:int, db: Session = Depends(get_db)):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/{id}" ,status_code= status.HTTP_202_ACCEPTED)
-def update_post(id:int, updated_post:post,db: Session = Depends(get_db)):
+@app.put("/posts/{id}" ,status_code= status.HTTP_202_ACCEPTED, response_model=schemas.PostResponse)
+def update_post(id:int, updated_post:schemas.PostCreate,db: Session = Depends(get_db)):
     post_query = db.query(models.post).filter(models.post.id==id)
     post = post_query.first()
 
@@ -91,4 +84,4 @@ def update_post(id:int, updated_post:post,db: Session = Depends(get_db)):
 
     post_query.update(updated_post.dict(),synchronize_session=False)
     db.commit()
-    return {"data",post_query.first()}
+    return post_query.first()
