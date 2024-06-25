@@ -1,0 +1,62 @@
+from fastapi import status,HTTPException,Response,Depends,APIRouter
+from .. import models,schemas
+from sqlalchemy.orm import Session
+from ..database import get_db
+from typing import List
+
+router=APIRouter()
+
+@router.get("/posts",response_model=List[schemas.PostResponse])
+def get_posts(db: Session = Depends(get_db)):
+    posts=db.query(models.post).all()
+    return posts
+
+@router.post("/posts",status_code=status.HTTP_201_CREATED,response_model=schemas.PostResponse)
+def create_posts(new_post:schemas.PostCreate, db: Session = Depends(get_db)):
+    post_dict = models.post(**new_post.dict())
+    db.add(post_dict)
+    db.commit()
+    db.refresh(post_dict)
+
+    return post_dict
+
+@router.get("/posts/latest", response_model=schemas.PostResponse)
+def get_latest_post(db: Session = Depends(get_db)):
+    post_dict=db.query(models.post).order_by(models.post.created_at.desc()).first()
+    return post_dict
+
+@router.get("/posts/{id}" , response_model=schemas.PostResponse)
+def get_post(id:int, db: Session = Depends(get_db)):
+    post_dict = db.query(models.post).filter(models.post.id==id).first()
+    if post_dict:
+        return post_dict
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail=f"sorry, post with id {id} not found")
+
+
+@router.delete("/posts/{id}" , status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id:int, db: Session = Depends(get_db)):
+    post_query = db.query(models.post).filter(models.post.id==id)
+    post_dict = post_query.first()
+
+    if  post_dict==None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                        detail=f"Sorry, post with id {id} not found")
+    
+    post_query.delete(synchronize_session=False)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.put("/posts/{id}" ,status_code= status.HTTP_202_ACCEPTED, response_model=schemas.PostResponse)
+def update_post(id:int, updated_post:schemas.PostCreate,db: Session = Depends(get_db)):
+    post_query = db.query(models.post).filter(models.post.id==id)
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail=f"Sorry, post with id {id} not found")
+
+    post_query.update(updated_post.dict(),synchronize_session=False)
+    db.commit()
+    return post_query.first()
