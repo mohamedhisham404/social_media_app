@@ -15,9 +15,8 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.PostResponse)
-def create_posts(new_post:schemas.PostCreate, db: Session = Depends(get_db),user_id:int = Depends(oauth2.get_current_user)):
-    print(user_id)
-    post_dict = models.post(**new_post.dict())
+def create_posts(new_post:schemas.PostCreate, db: Session = Depends(get_db),current_user:int = Depends(oauth2.get_current_user)):
+    post_dict = models.post(owner_id=current_user.id, **new_post.dict())
     db.add(post_dict)
     db.commit()
     db.refresh(post_dict)
@@ -40,7 +39,7 @@ def get_post(id:int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}" , status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id:int, db: Session = Depends(get_db) ,user_id:int = Depends(oauth2.get_current_user)):
+def delete_post(id:int, db: Session = Depends(get_db) ,current_user:int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.post).filter(models.post.id==id)
     post_dict = post_query.first()
 
@@ -53,7 +52,7 @@ def delete_post(id:int, db: Session = Depends(get_db) ,user_id:int = Depends(oau
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put("/{id}" ,status_code= status.HTTP_202_ACCEPTED, response_model=schemas.PostResponse)
-def update_post(id:int, updated_post:schemas.PostCreate,db: Session = Depends(get_db), user_id:int = Depends(oauth2.get_current_user)):
+def update_post(id:int, updated_post:schemas.PostCreate,db: Session = Depends(get_db), current_user:int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.post).filter(models.post.id==id)
     post = post_query.first()
 
