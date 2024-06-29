@@ -2,7 +2,7 @@ from fastapi import status,HTTPException,Response,Depends,APIRouter
 from .. import models,schemas,oauth2
 from sqlalchemy.orm import Session
 from ..database import get_db
-from typing import List
+from typing import List,Optional
 
 router=APIRouter(
     prefix="/posts",
@@ -10,8 +10,8 @@ router=APIRouter(
 )
 
 @router.get("/",response_model=List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db)):
-    posts=db.query(models.post).all()
+def get_posts(db: Session = Depends(get_db),search: Optional[str]=""):
+    posts=db.query(models.post).filter(models.post.title.contains(search)).all()
     return posts
 
 @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.PostResponse)
