@@ -29,10 +29,11 @@ class PostResponse(PostBase):
     created_at: datetime
     owner_id: int
     owner: UserResponse
-    
+    votes: int = 0
 
     class Config:
         orm_mode = True
+
 
 class Token(BaseModel):
     access_token: str
@@ -43,4 +44,3 @@ class TokenData(BaseModel):
 
 class vote(BaseModel):
     post_id: int
-    dir: conint(le=1)

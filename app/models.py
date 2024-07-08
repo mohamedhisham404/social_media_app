@@ -13,6 +13,7 @@ class post(Base):
     created_at = Column(TIMESTAMP(timezone=True),server_default=text("now()"))
     owner_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
     owner =relationship("User")
+    votes = Column(Integer,nullable=False,server_default="0")
 
 class User(Base):
     __tablename__ = "users"

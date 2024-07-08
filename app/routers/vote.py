@@ -18,20 +18,26 @@ def create_vote(vote:schemas.vote,  db: Session = Depends(database.get_db),curre
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Sorry, post with id {vote.post_id } not found") 
-    if(vote.dir):
-        if found_vote:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                                detail="You have already voted for this post")
-        
-        new_vote = models.Vote(post_id=vote.post_id,user_id=current_user.id)
-        db.add(new_vote)
-        db.commit()
-        return {"new_vote":"success"}
-    else:
-        if not found_vote:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="You have not voted for this post")
-        
+   
+    if found_vote:
+        #delete from the vote table
         vote_query.delete(synchronize_session=False)
         db.commit()
+    
+        #decrease the number of the post votes from the poste table
+        post.votes -= 1
+        db.commit()
+        db.refresh(post)
         return {"deleted_vote":"success"}
+    
+    new_vote = models.Vote(post_id=vote.post_id,user_id=current_user.id)
+    db.add(new_vote)
+    db.commit()
+
+    post.votes +=1
+    db.commit()
+    db.refresh(post)
+    return {"new_vote":"success"}
+   
+        
+       
