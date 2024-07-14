@@ -19,7 +19,7 @@ git clone https://github.com/mohamedhisham404/social_media_app
 cd social_media_app
 python3.8 -m venv fastapi
 ```
-3- Mctivate it 
+3- Activate it 
 ```
 source fastapi/bin/activate 
 ```
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ```
 fastapi dev app/main.py --reload
 ```
-6- put that url in the web browser
+6- Put that url in the web browser
 ```
 http://127.0.0.1:8000/docs#/
 ```
