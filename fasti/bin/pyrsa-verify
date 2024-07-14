@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/media/mohamed/New Volume3/work/fastapi/fasti/bin/python3" "$0" "$@"
+'''exec' "/media/mohamed/New Volume3/work/fastapi/social_media_app/fasti/bin/python3.8" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
