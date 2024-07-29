@@ -1,6 +1,6 @@
 # Social Media App
 The app is a fully functional social media app with multiple features built with fastAPI
-![Screenshot from 2024-07-14 23-19-21](https://github.com/user-attachments/assets/32e86472-cd4c-45ad-831a-99dcddf223ae)
+![Screenshot from 2024-07-29 16-21-09](https://github.com/user-attachments/assets/f7a8f527-451b-4efa-bc25-0fe396c2eac7)
 
 # Features
 * the user can create an account and login with the email and password
