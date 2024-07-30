@@ -1,6 +1,7 @@
 from fastapi import status,HTTPException,Depends,APIRouter
 from .. import models,schemas,database,oauth2
 from sqlalchemy.orm import Session
+from ..crud.vote import create_vote as vote_on_post
 
 router=APIRouter(
     prefix="/vote",
@@ -8,34 +9,9 @@ router=APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_vote(vote:schemas.vote,  db: Session = Depends(database.get_db),current_user:int = Depends(oauth2.get_current_user)):
-    vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id)
-    found_vote=vote_query.first()
-  
-    post = db.query(models.post).filter(models.post.id == vote.post_id).first()
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail=f"Sorry, post with id {vote.post_id } not found") 
-   
-    if found_vote:
-        #delete from the vote table
-        vote_query.delete(synchronize_session=False)
-        db.commit()
-    
-        #decrease the number of the post votes from the poste table
-        post.votes -= 1
-        db.commit()
-        db.refresh(post)
-        return {"deleted_vote":"success"}
-    
-    new_vote = models.Vote(post_id=vote.post_id,user_id=current_user.id)
-    db.add(new_vote)
-    db.commit()
+def create_vote(vote: schemas.vote, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+    return vote_on_post(db, vote, current_user.id)
 
-    post.votes +=1
-    db.commit()
-    db.refresh(post)
-    return {"new_vote":"success"}
    
         
        
