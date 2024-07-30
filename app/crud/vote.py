@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from .. import models, schemas
+from .. import models
+from schemas import vote as voteSchema
 
-def create_vote(db: Session, vote: schemas.vote, user_id: int):
+def create_vote(db: Session, vote: voteSchema.vote, user_id: int):
     vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == user_id)
     found_vote = vote_query.first()
   

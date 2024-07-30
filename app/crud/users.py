@@ -1,8 +1,9 @@
 from fastapi import status,HTTPException
-from .. import models,schemas,utils
+from .. import models,utils
 from sqlalchemy.orm import Session
+from schemas import users as usesrsSchema
 
-def create_user(user:schemas.UserCreate,  db: Session):
+def create_user(user:usesrsSchema.UserCreate,  db: Session):
     #creat hashed password
     hashed_password = utils.hash(user.password)
     user.password =  hashed_password

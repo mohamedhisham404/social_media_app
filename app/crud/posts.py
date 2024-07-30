@@ -1,13 +1,14 @@
 from fastapi import HTTPException,status,Response
 from sqlalchemy.orm import Session
-from typing import List,Optional
-from .. import models,schemas
+from typing import Optional
+from .. import models
+from schemas import posts as postsSchema
 
 def get_posts(db: Session ,search: Optional[str]=""):
     posts=db.query(models.post).filter(models.post.title.contains(search)).all()
     return posts
 
-def create_posts(new_post:schemas.PostCreate, db: Session ,current_user:int):
+def create_posts(new_post:postsSchema.PostCreate, db: Session ,current_user:int):
     post_dict = models.post(owner_id=current_user.id, **new_post.dict())
     db.add(post_dict)
     db.commit()
@@ -45,7 +46,7 @@ def delete_post(id:int, db: Session ,current_user:int):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-def update_post(db: Session, post_id: int, updated_post: schemas.PostCreate, user_id: int) :
+def update_post(db: Session, post_id: int, updated_post: postsSchema.PostCreate, user_id: int) :
     post_query = db.query(models.post).filter(models.post.id == post_id)
     post_dict = post_query.first()
 
