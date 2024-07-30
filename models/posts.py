@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean,ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import relationship
-from .database import Base
+from app.database import Base
 
 class post(Base):
     __tablename__ = "posts"
@@ -14,16 +14,3 @@ class post(Base):
     owner_id=Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
     owner =relationship("User")
     votes = Column(Integer,nullable=False,server_default="0")
-
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True,nullable=False)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),server_default=text("now()"))
-
-class Vote(Base):
-    __tablename__ = "votes"
-    user_id = Column(Integer,ForeignKey("users.id", ondelete="CASCADE"),primary_key=True)
-    post_id = Column(Integer,ForeignKey("posts.id", ondelete="CASCADE"),primary_key=True)
-

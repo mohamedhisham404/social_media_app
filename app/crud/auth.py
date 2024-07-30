@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from .. import models, utils, oauth2
+from app.crud import utils
+from app import  oauth2
+from models import users as usersModel
 
 def authenticate_user(db: Session, username: str, password: str):
-    user_dict = db.query(models.User).filter(models.User.email == username).first()
+    user_dict = db.query(usersModel.User).filter(usersModel.User.email == username).first()
     if not user_dict:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"sorry, user with email {username} not found")

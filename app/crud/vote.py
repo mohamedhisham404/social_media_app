@@ -1,13 +1,15 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from .. import models
+from models import vote as voteModel
+from models import posts as postModel
 from schemas import vote as voteSchema
 
+
 def create_vote(db: Session, vote: voteSchema.vote, user_id: int):
-    vote_query = db.query(models.Vote).filter(models.Vote.post_id == vote.post_id, models.Vote.user_id == user_id)
+    vote_query = db.query(voteModel.Vote).filter(voteModel.Vote.post_id == vote.post_id, voteModel.Vote.user_id == user_id)
     found_vote = vote_query.first()
   
-    post = db.query(models.post).filter(models.post.id == vote.post_id).first()
+    post = db.query(postModel.post).filter(postModel.post.id == vote.post_id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Sorry, post with id {vote.post_id} not found")
@@ -23,7 +25,7 @@ def create_vote(db: Session, vote: voteSchema.vote, user_id: int):
         db.refresh(post)
         return {"deleted_vote": "success"}
     
-    new_vote = models.Vote(post_id=vote.post_id, user_id=user_id)
+    new_vote = voteModel.Vote(post_id=vote.post_id, user_id=user_id)
     db.add(new_vote)
     db.commit()
 
