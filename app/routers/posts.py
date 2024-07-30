@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from typing import List,Optional
 from ..crud import posts
-from schemas import posts as postsSchema
+from ..schemas import posts as postsSchema
 
 router=APIRouter(
     prefix="/posts",

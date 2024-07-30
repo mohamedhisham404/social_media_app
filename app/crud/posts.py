@@ -1,8 +1,8 @@
 from fastapi import HTTPException,status,Response
 from sqlalchemy.orm import Session
 from typing import Optional
-from models import posts as postsModel
-from schemas import posts as postsSchema
+from ..models import posts as postsModel
+from ..schemas import posts as postsSchema
 
 def get_posts(db: Session ,search: Optional[str]=""):
     posts=db.query(postsModel.post).filter(postsModel.post.title.contains(search)).all()

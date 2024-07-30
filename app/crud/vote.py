@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from models import vote as voteModel
-from models import posts as postModel
-from schemas import vote as voteSchema
+from ..models import vote as voteModel
+from ..models import posts as postModel
+from ..schemas import vote as voteSchema
 
 
 def create_vote(db: Session, vote: voteSchema.vote, user_id: int):

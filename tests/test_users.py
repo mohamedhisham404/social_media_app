@@ -1,6 +1,6 @@
 from jose import jwt
-from schemas import users as usersSchema 
-from schemas import auth as authSchema
+from app.schemas import users as usersSchema 
+from app.schemas import auth as authSchema
 from app.config import settings
 import pytest
 

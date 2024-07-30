@@ -2,7 +2,7 @@ from fastapi import status,Depends,APIRouter
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..crud import users
-from schemas import users as usersSchema
+from ..schemas import users as usersSchema
 router=APIRouter(
     prefix="/users",
     tags=["users"]

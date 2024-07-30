@@ -2,7 +2,7 @@ from fastapi import status,Depends,APIRouter
 from .. import database,oauth2
 from sqlalchemy.orm import Session
 from ..crud.vote import create_vote as vote_on_post
-from schemas import vote as voteSchema
+from ..schemas import vote as voteSchema
 
 router=APIRouter(
     prefix="/vote",

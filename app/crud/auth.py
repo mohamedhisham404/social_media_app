@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.crud import utils
-from app import  oauth2
-from models import users as usersModel
+from app import oauth2
+from ..models import users as usersModel
 
 def authenticate_user(db: Session, username: str, password: str):
     user_dict = db.query(usersModel.User).filter(usersModel.User.email == username).first()
