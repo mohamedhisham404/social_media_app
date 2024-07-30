@@ -8,7 +8,7 @@ from app.database import Base
 from app.main import app
 from app.oauth2 import create_access_token
 from fastapi.testclient import TestClient
-from app import models
+from models import posts as postsModel
 import pytest
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
@@ -76,7 +76,7 @@ def test_posts(test_user,session):
     }]
 
     def create_post_model(post):
-        return models.post(**post)
+        return postsModel.post(**post)
 
     post_map = map(create_post_model, posts_data)
     posts = list(post_map)
@@ -85,5 +85,5 @@ def test_posts(test_user,session):
    
     session.commit()
 
-    posts = session.query(models.post).all()
+    posts = session.query(postsModel.post).all()
     return posts
